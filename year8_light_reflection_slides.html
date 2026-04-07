@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Year 8 — The Law of Reflection</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --blue: #1a6fc4;
+    --blue-light: #dbeafe;
+    --blue-mid: #3b82f6;
+    --orange: #c2410c;
+    --orange-light: #ffedd5;
+    --green: #15803d;
+    --green-light: #dcfce7;
+    --teal: #0d9488;
+    --teal-light: #ccfbf1;
+    --purple: #7c3aed;
+    --purple-light: #ede9fe;
+    --amber: #b45309;
+    --amber-light: #fef3c7;
+    --slate: #1e293b;
+    --slate-mid: #334155;
+    --slate-light: #64748b;
+    --body: #f8fafc;
+    --card: #ffffff;
+    --border: #e2e8f0;
+    --serif: 'DM Serif Display', serif;
+    --sans: 'DM Sans', sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+
+  html, body {
+    height: 100%;
+    font-family: var(--sans);
+    background: #0f172a;
+    overflow: hidden;
+  }
+
+  /* ── Slide shell ── */
+  .deck { width: 100vw; height: 100vh; position: relative; }
+
+  .slide {
+    position: absolute; inset: 0;
+    display: none;
+    flex-direction: column;
+    background: var(--body);
+    overflow: hidden;
+  }
+  .slide.active { display: flex; }
+
+  /* ── Navigation ── */
+  .nav {
+    position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 1rem;
+    background: rgba(15,23,42,0.92); backdrop-filter: blur(8px);
+    border-radius: 2rem; padding: .5rem 1.25rem;
+    z-index: 999;
+  }
+  .nav button {
+    background: none; border: 1.5px solid rgba(255,255,255,0.25);
+    color: #fff; font-family: var(--sans); font-size: .85rem;
+    padding: .35rem .9rem; border-radius: 1rem; cursor: pointer;
+    transition: background .2s;
+  }
+  .nav button:hover { background: rgba(255,255,255,0.12); }
+  .nav button:disabled { opacity: .3; cursor: default; }
+  .nav .counter { color: rgba(255,255,255,0.55); font-size: .8rem; min-width: 4rem; text-align: center; font-family: var(--mono); }
+
+  /* ── Shared slide parts ── */
+  .slide-header {
+    padding: 2rem 3rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: flex-start; gap: 1rem;
+  }
+  .slide-label {
+    font-size: .7rem; font-weight: 600; letter-spacing: .12em;
+    text-transform: uppercase; padding: .3rem .75rem;
+    border-radius: .35rem; white-space: nowrap; margin-top: .25rem;
+  }
+  .slide-title {
+    font-family: var(--serif); font-size: 2rem; color: var(--slate); line-height: 1.2;
+  }
+  .slide-body {
+    flex: 1; padding: 1.75rem 3rem 5rem; overflow-y: auto;
+  }
+
+  /* ── Label colours ── */
+  .lbl-intro    { background: var(--blue-light);   color: var(--blue); }
+  .lbl-explore  { background: var(--teal-light);   color: var(--teal); }
+  .lbl-vocab    { background: var(--purple-light);  color: var(--purple); }
+  .lbl-law      { background: var(--green-light);   color: var(--green); }
+  .lbl-think    { background: var(--amber-light);   color: var(--amber); }
+  .lbl-table    { background: var(--orange-light);  color: var(--orange); }
+  .lbl-prac     { background: #f1f5f9; color: var(--slate-mid); }
+  .lbl-draw     { background: var(--blue-light);    color: var(--blue); }
+  .lbl-quiz     { background: var(--purple-light);  color: var(--purple); }
+  .lbl-exit     { background: var(--green-light);   color: var(--green); }
+
+  /* ── Slide 1: Title ── */
+  #s1 {
+    background: var(--slate);
+    justify-content: center; align-items: center;
+    text-align: center;
+  }
+  #s1 .big { font-family: var(--serif); font-size: 3.5rem; color: #fff; line-height: 1.15; }
+  #s1 .sub { font-size: 1.1rem; color: rgba(255,255,255,.55); margin-top: .75rem; }
+  #s1 .obj-box {
+    margin: 2rem auto 0; max-width: 520px;
+    background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.15);
+    border-radius: 1rem; padding: 1.25rem 1.75rem; text-align: left;
+  }
+  #s1 .obj-box h3 { color: rgba(255,255,255,.45); font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; margin-bottom: .75rem; }
+  #s1 .obj-box li { color: rgba(255,255,255,.8); font-size: .95rem; margin: .4rem 0 .4rem 1rem; }
+  #s1 .hook {
+    margin-top: 2.5rem;
+    background: #1a6fc4; color: #fff;
+    display: inline-block; padding: .6rem 1.5rem; border-radius: 2rem;
+    font-size: 1rem; font-weight: 500;
+  }
+  .ray-deco { position: absolute; opacity: .12; pointer-events: none; }
+
+  /* ── Cards / grid ── */
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: .75rem; padding: 1.25rem 1.5rem;
+  }
+  .card-grid { display: grid; gap: 1rem; }
+  .cols-2 { grid-template-columns: 1fr 1fr; }
+  .cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+  /* ── Vocab cards ── */
+  .vocab-card { border-radius: .75rem; overflow: hidden; border: 1px solid var(--border); }
+  .vocab-term {
+    padding: .85rem 1.25rem; font-family: var(--serif); font-size: 1.25rem;
+    color: #fff;
+  }
+  .vocab-def { padding: .85rem 1.25rem; background: var(--card); font-size: .92rem; color: var(--slate-mid); line-height: 1.5; }
+  .vocab-eg  { padding: .5rem 1.25rem .85rem; background: var(--card); font-size: .82rem; color: var(--slate-light); font-style: italic; }
+
+  /* ── Law of reflection display ── */
+  .law-box {
+    text-align: center; padding: 2rem;
+    background: var(--green-light); border: 1.5px solid #86efac;
+    border-radius: 1rem; margin-bottom: 1.5rem;
+  }
+  .law-eq { font-family: var(--serif); font-size: 2.4rem; color: var(--green); }
+  .law-sub { color: var(--slate-light); font-size: .9rem; margin-top: .5rem; }
+
+  /* ── Think prompt ── */
+  .think-box {
+    background: var(--amber-light); border: 1.5px solid #fde68a;
+    border-radius: 1rem; padding: 1.5rem 2rem;
+    display: flex; gap: 1rem; align-items: flex-start;
+  }
+  .think-icon { font-size: 2rem; flex-shrink: 0; }
+  .think-text h3 { font-size: 1.05rem; font-weight: 600; color: var(--amber); margin-bottom: .4rem; }
+  .think-text p { font-size: .92rem; color: var(--slate-mid); line-height: 1.55; }
+
+  /* ── Differentiation toggles ── */
+  .diff-tabs { display: flex; gap: .5rem; margin-bottom: 1rem; }
+  .diff-tab {
+    padding: .4rem 1rem; border-radius: .4rem; border: 1.5px solid var(--border);
+    font-size: .85rem; font-weight: 500; cursor: pointer; background: var(--card);
+    color: var(--slate-mid); transition: all .2s;
+  }
+  .diff-tab.active { background: var(--slate); color: #fff; border-color: var(--slate); }
+  .diff-panel { display: none; }
+  .diff-panel.active { display: block; }
+
+  /* ── Table builder (independent) ── */
+  .table-preview {
+    border: 1.5px dashed #94a3b8; border-radius: .75rem;
+    padding: 1.25rem; background: #f8fafc; margin-top: .75rem;
+  }
+  .table-preview table {
+    width: 100%; border-collapse: collapse; font-size: .88rem;
+  }
+  .table-preview th {
+    background: var(--slate); color: #fff;
+    padding: .5rem .75rem; text-align: left; font-weight: 500; font-size: .82rem;
+  }
+  .table-preview td {
+    border: 1px solid var(--border); padding: .45rem .75rem;
+    color: var(--slate-light); font-style: italic; font-size: .82rem;
+  }
+  .table-preview tr:nth-child(even) td { background: #f1f5f9; }
+
+  /* ── Drag and drop table ── */
+  .drag-zone {
+    display: flex; gap: .5rem; flex-wrap: wrap;
+    padding: 1rem; border: 1.5px dashed #94a3b8;
+    border-radius: .75rem; min-height: 3.5rem; background: #f8fafc;
+    margin-bottom: .75rem;
+  }
+  .drag-chip {
+    padding: .35rem .85rem; border-radius: .35rem;
+    font-size: .82rem; font-weight: 500; cursor: grab;
+    user-select: none; border: 1px solid var(--border);
+    background: var(--card); color: var(--slate);
+    transition: transform .15s, box-shadow .15s;
+  }
+  .drag-chip:active { transform: scale(1.05); cursor: grabbing; }
+  .drag-chip.placed { opacity: .4; }
+  .drop-col {
+    border: 1.5px dashed #94a3b8; border-radius: .5rem;
+    min-height: 5rem; padding: .5rem; background: #fff;
+    flex: 1; min-width: 120px;
+  }
+  .drop-col h4 { font-size: .75rem; color: var(--slate-light); margin-bottom: .4rem; text-transform: uppercase; letter-spacing: .08em; }
+  .drop-col .drag-chip { margin: .2rem; }
+  .drop-col.drag-over { background: var(--blue-light); border-color: var(--blue); }
+
+  /* ── Practical instructions ── */
+  .step-list { counter-reset: steps; display: flex; flex-direction: column; gap: .75rem; }
+  .step {
+    display: flex; gap: 1rem; align-items: flex-start;
+    padding: .85rem 1rem; background: var(--card);
+    border: 1px solid var(--border); border-radius: .65rem;
+  }
+  .step-num {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--slate); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .8rem; font-weight: 600; flex-shrink: 0;
+  }
+  .step p { font-size: .9rem; color: var(--slate-mid); line-height: 1.5; }
+
+  /* ── Draw-it prompt ── */
+  .draw-canvas-wrap {
+    background: #fff; border: 1.5px solid var(--border);
+    border-radius: .75rem; overflow: hidden; margin-top: .75rem;
+    position: relative;
+  }
+  #drawCanvas { display: block; cursor: crosshair; touch-action: none; }
+  .draw-tools { display: flex; gap: .5rem; padding: .6rem 1rem; background: #f8fafc; border-bottom: 1px solid var(--border); flex-wrap: wrap; align-items: center; }
+  .draw-tools label { font-size: .78rem; color: var(--slate-light); }
+  .colour-btn { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border); cursor: pointer; }
+  .colour-btn.selected { border-color: var(--slate); transform: scale(1.2); }
+  .size-btn { padding: .25rem .6rem; border-radius: .3rem; border: 1px solid var(--border); background: var(--card); cursor: pointer; font-size: .78rem; color: var(--slate-mid); }
+  .size-btn.selected { background: var(--slate); color: #fff; }
+  .draw-legend {
+    display: flex; flex-wrap: wrap; gap: 1rem; margin-top: .75rem;
+  }
+  .dleg { display: flex; align-items: center; gap: .4rem; font-size: .82rem; color: var(--slate-mid); }
+  .dleg-line { width: 28px; height: 3px; border-radius: 2px; }
+
+  /* ── Quiz ── */
+  .quiz-q-box { margin-bottom: 1.25rem; }
+  .quiz-q-text { font-weight: 500; font-size: 1rem; color: var(--slate); margin-bottom: .75rem; }
+  .quiz-options { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+  .quiz-opt {
+    padding: .65rem 1rem; border: 1.5px solid var(--border);
+    border-radius: .5rem; cursor: pointer; font-size: .88rem;
+    color: var(--slate-mid); background: var(--card);
+    transition: all .2s; text-align: left;
+  }
+  .quiz-opt:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-light); }
+  .quiz-opt.correct { border-color: var(--green); background: var(--green-light); color: var(--green); }
+  .quiz-opt.wrong { border-color: #dc2626; background: #fef2f2; color: #dc2626; }
+  .quiz-opt.reveal { border-color: var(--green); background: var(--green-light); color: var(--green); }
+  .quiz-score {
+    text-align: center; padding: 1.5rem;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 1rem; font-family: var(--serif); font-size: 2rem;
+    color: var(--slate);
+  }
+  .tf-opts { display: flex; gap: .75rem; }
+  .tf-opt {
+    flex: 1; padding: .65rem 1rem; border: 1.5px solid var(--border);
+    border-radius: .5rem; cursor: pointer; font-size: 1rem; font-weight: 600;
+    text-align: center; color: var(--slate-mid); background: var(--card); transition: all .2s;
+  }
+  .fill-input {
+    width: 100%; padding: .55rem .85rem; border: 1.5px solid var(--border);
+    border-radius: .5rem; font-size: .95rem; font-family: var(--sans);
+    color: var(--slate); background: var(--card);
+    outline: none; transition: border-color .2s;
+  }
+  .fill-input:focus { border-color: var(--blue); }
+  .check-btn {
+    margin-top: .5rem; padding: .45rem 1.25rem;
+    background: var(--slate); color: #fff; border: none;
+    border-radius: .5rem; cursor: pointer; font-size: .88rem;
+    font-family: var(--sans); transition: opacity .2s;
+  }
+  .check-btn:hover { opacity: .85; }
+  .quiz-feedback { font-size: .85rem; margin-top: .4rem; font-weight: 500; min-height: 1.2rem; }
+  .quiz-progress { display: flex; gap: .35rem; margin-bottom: 1.5rem; }
+  .qpip { height: 5px; flex: 1; border-radius: 3px; background: var(--border); }
+  .qpip.done-correct { background: var(--green); }
+  .qpip.done-wrong { background: #dc2626; }
+  .qpip.current { background: var(--blue); }
+
+  /* ── Exit ticket ── */
+  .exit-textarea {
+    width: 100%; min-height: 100px; padding: .85rem 1rem;
+    border: 1.5px solid var(--border); border-radius: .65rem;
+    font-size: .95rem; font-family: var(--sans); resize: vertical;
+    color: var(--slate); background: var(--card); outline: none;
+  }
+  .exit-textarea:focus { border-color: var(--green); }
+  .star-row { display: flex; gap: .5rem; font-size: 1.8rem; cursor: pointer; }
+  .star { transition: transform .15s; }
+  .star:hover { transform: scale(1.2); }
+
+  /* ── Simulation embed area ── */
+  .sim-frame {
+    width: 100%; height: 340px; border-radius: .75rem;
+    border: 1px solid var(--border); background: #f8fafc;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 1rem; position: relative; overflow: hidden;
+  }
+  .sim-canvas { display: block; width: 100%; height: 100%; }
+  .phet-link-box {
+    background: var(--teal-light); border: 1.5px solid #5eead4;
+    border-radius: .75rem; padding: 1rem 1.5rem;
+    display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;
+  }
+  .phet-icon { font-size: 2.2rem; }
+  .phet-link-box a { color: var(--teal); font-weight: 600; font-size: 1rem; text-decoration: none; }
+  .phet-link-box a:hover { text-decoration: underline; }
+  .phet-link-box p { font-size: .85rem; color: var(--slate-mid); margin-top: .2rem; }
+
+  /* ── Model table answer ── */
+  .model-table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+  .model-table th { background: var(--slate); color: #fff; padding: .6rem .85rem; text-align: left; font-weight: 500; }
+  .model-table td { border: 1px solid var(--border); padding: .5rem .85rem; }
+  .model-table tr:nth-child(even) td { background: #f8fafc; }
+  .model-table td.data { color: var(--slate-light); font-style: italic; font-size: .82rem; }
+  .good-badge { display: inline-flex; align-items: center; gap: .3rem; font-size: .78rem; font-weight: 600; padding: .2rem .6rem; border-radius: .3rem; }
+  .good-green { background: var(--green-light); color: var(--green); }
+  .good-blue  { background: var(--blue-light); color: var(--blue); }
+
+  @media (max-width: 640px) {
+    .slide-header { padding: 1.25rem 1.25rem .75rem; }
+    .slide-body { padding: 1rem 1.25rem 5rem; }
+    .slide-title { font-size: 1.4rem; }
+    .cols-2, .cols-3 { grid-template-columns: 1fr; }
+    .quiz-options { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="deck">
+
+  <!-- ══ SLIDE 1: TITLE ══ -->
+  <div class="slide active" id="s1">
+    <svg class="ray-deco" style="top:0;left:0;width:100%;height:100%;" viewBox="0 0 900 600" preserveAspectRatio="xMidYMid slice">
+      <line x1="120" y1="60" x2="450" y2="400" stroke="#3b82f6" stroke-width="2"/>
+      <line x1="450" y1="400" x2="760" y2="100" stroke="#f97316" stroke-width="2"/>
+      <line x1="450" y1="20" x2="450" y2="580" stroke="#94a3b8" stroke-width="1" stroke-dasharray="10 8"/>
+      <line x1="80" y1="580" x2="820" y2="580" stroke="#10b981" stroke-width="3"/>
+    </svg>
+    <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;text-align:center;padding:2rem;">
+      <div style="font-size:.75rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:.75rem;">Year 8 Physics · Light</div>
+      <div class="big">The Law of<br>Reflection</div>
+      <div class="sub">How does light behave when it bounces off a surface?</div>
+      <div class="obj-box">
+        <h3>Learning objectives</h3>
+        <ul style="list-style:none;">
+          <li>✦ Identify and label parts of a reflection diagram</li>
+          <li>✦ State and apply the law of reflection</li>
+          <li>✦ Design and complete a scientific results table</li>
+          <li>✦ Draw an accurate reflection diagram using a protractor</li>
+        </ul>
+      </div>
+      <div class="hook">💬 How does a periscope work?</div>
+    </div>
+  </div>
+
+  <!-- ══ SLIDE 2: PhET ══ -->
+  <div class="slide" id="s2">
+    <div class="slide-header">
+      <span class="slide-label lbl-explore">Explore</span>
+      <h1 class="slide-title">Let's investigate — PhET simulation</h1>
+    </div>
+    <div class="slide-body">
+      <div class="phet-link-box">
+        <div class="phet-icon">🔬</div>
+        <div>
+          <a href="https://phet.colorado.edu/en/simulations/bending-light" target="_blank">Open PhET: Bending Light →</a>
+          <p>Go to <strong>Intro</strong> tab. Switch the bottom material to <strong>Mirror</strong>.</p>
+        </div>
+      </div>
+      <div class="card-grid cols-3" style="margin-bottom:1rem;">
+        <div class="card" style="border-left:4px solid var(--blue);">
+          <div style="font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);margin-bottom:.4rem;">Task 1</div>
+          <p style="font-size:.88rem;color:var(--slate-mid);">Drag the protractor tool onto the mirror. Rotate the incoming ray to different angles. What do you notice about the two angles?</p>
+        </div>
+        <div class="card" style="border-left:4px solid var(--orange);">
+          <div style="font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--orange);margin-bottom:.4rem;">Task 2</div>
+          <p style="font-size:.88rem;color:var(--slate-mid);">Can you make the reflected ray go straight back the way it came? What angle do you need? What does this tell you?</p>
+        </div>
+        <div class="card" style="border-left:4px solid var(--purple);">
+          <div style="font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--purple);margin-bottom:.4rem;">Task 3</div>
+          <p style="font-size:.88rem;color:var(--slate-mid);">Write down three pairs of angle readings in your book. Do you spot a pattern?</p>
+        </div>
+      </div>
+      <div class="think-box">
+        <div class="think-icon">🧠</div>
+        <div class="think-text">
+          <h3>Discuss with your partner</h3>
+          <p>Where might you see reflected light in everyday life? Think of at least three examples before we move on.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SLIDE 3: KEY VOCABULARY ══ -->
+  <div class="slide" id="s3">
+    <div class="slide-header">
+      <span class="slide-label lbl-vocab">Vocabulary</span>
+      <h1 class="slide-title">Key terms you need to know</h1>
+    </div>
+    <div class="slide-body">
+      <div class="card-grid cols-2" style="margin-bottom:1rem;">
+        <div class="vocab-card">
+          <div class="vocab-term" style="background:var(--blue);">Incident ray</div>
+          <div class="vocab-def">The ray of light that travels <strong>towards</strong> the mirror surface.</div>
+          <div class="vocab-eg">From the Latin <em>incidere</em> — to fall upon</div>
+        </div>
+        <div class="vocab-card">
+          <div class="vocab-term" style="background:var(--orange);">Reflected ray</div>
+          <div class="vocab-def">The ray of light that bounces <strong>away from</strong> the mirror surface after striking it.</div>
+          <div class="vocab-eg">Always drawn with an arrow pointing away</div>
+        </div>
+        <div class="vocab-card">
+          <div class="vocab-term" style="background:#475569;">The normal</div>
+          <div class="vocab-def">An imaginary dashed line drawn at <strong>exactly 90°</strong> to the mirror surface at the point of incidence.</div>
+          <div class="vocab-eg">Always drawn as a dashed line — it isn't a real ray!</div>
+        </div>
+        <div class="vocab-card">
+          <div class="vocab-term" style="background:var(--green);">Angle of incidence</div>
+          <div class="vocab-def">The angle between the <strong>incident ray</strong> and the <strong>normal</strong>. Labelled <em>i</em>.</div>
+          <div class="vocab-eg">⚠️ NOT the angle from the mirror surface</div>
+        </div>
+        <div class="vocab-card" style="grid-column:1/-1;">
+          <div class="vocab-term" style="background:var(--teal);">Angle of reflection</div>
+          <div class="vocab-def">The angle between the <strong>reflected ray</strong> and the <strong>normal</strong>. Labelled <em>r</em>. This always equals the angle of incidence.</div>
+          <div class="vocab-eg">Both angles measured from the same line — the normal</div>
+        </div>
+      </div>
+      <!-- mini diagram -->
+      <div style="background:#f8fafc;border:1px solid var(--border);border-radius:.75rem;padding:.75rem;text-align:center;">
+        <svg viewBox="0 0 500 220" width="100%" style="max-height:180px;">
+          <line x1="40" y1="170" x2="460" y2="170" stroke="#1D9E75" stroke-width="4"/>
+          <line x1="250" y1="20" x2="250" y2="195" stroke="#888" stroke-width="1.5" stroke-dasharray="8 5"/>
+          <line x1="100" y1="30" x2="250" y2="170" stroke="#378ADD" stroke-width="2.5" marker-end="url(#ab)"/>
+          <line x1="250" y1="170" x2="400" y2="30" stroke="#D85A30" stroke-width="2.5" marker-end="url(#ao)"/>
+          <defs>
+            <marker id="ab" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#378ADD"/></marker>
+            <marker id="ao" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#D85A30"/></marker>
+          </defs>
+          <path d="M250,170 m-50,0 a50,50 0 0,1 35,-35" stroke="#888" stroke-width="1" fill="none"/>
+          <path d="M250,170 m50,0 a50,50 0 0,0 -35,-35" stroke="#888" stroke-width="1" fill="none"/>
+          <text x="185" y="118" fill="#0C447C" font-size="13" font-family="serif">i</text>
+          <text x="305" y="118" fill="#993C1D" font-size="13" font-family="serif">r</text>
+          <text x="255" y="40" fill="#555" font-size="11">Normal</text>
+          <text x="60" y="60" fill="#0C447C" font-size="11">Incident ray</text>
+          <text x="370" y="60" fill="#993C1D" font-size="11">Reflected ray</text>
+          <text x="170" y="192" fill="#0F6E56" font-size="11">Mirror surface</text>
+          <text x="222" y="210" fill="#333" font-size="11">Point of incidence</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SLIDE 4: THE LAW ══ -->
+  <div class="slide" id="s4">
+    <div class="slide-header">
+      <span class="slide-label lbl-law">The Law</span>
+      <h1 class="slide-title">The law of reflection</h1>
+    </div>
+    <div class="slide-body">
+      <div class="law-box">
+        <div class="law-eq">angle of incidence = angle of reflection</div>
+        <div class="law-sub">Both angles measured from the normal to the mirror surface</div>
+      </div>
+      <div class="card-grid cols-2" style="margin-bottom:1rem;">
+        <div class="card">
+          <div style="font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--green);margin-bottom:.6rem;">In symbols</div>
+          <div style="font-family:var(--mono);font-size:1.6rem;color:var(--slate);text-align:center;padding:.5rem 0;"> i = r </div>
+          <div style="font-size:.82rem;color:var(--slate-light);text-align:center;">where i and r are measured in degrees (°)</div>
+        </div>
+        <div class="card">
+          <div style="font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--orange);margin-bottom:.6rem;">Common mistake ⚠️</div>
+          <p style="font-size:.88rem;color:var(--slate-mid);line-height:1.55;">Students often measure angles from the <strong>mirror surface</strong> instead of the normal. This gives 90° − the correct angle. Always use the dashed normal line!</p>
+        </div>
+      </div>
+      <div class="card-grid cols-3">
+        <div class="card" style="text-align:center;">
+          <div style="font-size:.78rem;color:var(--slate-light);margin-bottom:.3rem;">If i = 30°</div>
+          <div style="font-family:var(--serif);font-size:1.4rem;color:var(--green);">r = 30°</div>
+        </div>
+        <div class="card" style="text-align:center;">
+          <div style="font-size:.78rem;color:var(--slate-light);margin-bottom:.3rem;">If i = 55°</div>
+          <div style="font-family:var(--serif);font-size:1.4rem;color:var(--green);">r = 55°</div>
+        </div>
+        <div class="card" style="text-align:center;">
+          <div style="font-size:.78rem;color:var(--slate-light);margin-bottom:.3rem;">If i = 0°</div>
+          <div style="font-family:var(--serif);font-size:1.4rem;color:var(--green);">r = 0°</div>
+          <div style="font-size:.75rem;color:var(--slate-light);">ray bounces straight back!</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SLIDE 5: THINK — design your table ══ -->
+  <div class="slide" id="s5">
+    <div class="slide-header">
+      <span class="slide-label lbl-think">Think first</span>
+      <h1 class="slide-title">Design your results table</h1>
+    </div>
+    <div class="slide-body">
+      <div class="think-box" style="margin-bottom:1.25rem;">
+        <div class="think-icon">🧠</div>
+        <div class="think-text">
+          <h3>Before the practical — think like a scientist</h3>
+          <p>You're going to investigate the law of reflection using a ray box and plane mirror. <strong>What should your results table look like?</strong> Discuss with your partner for 2 minutes, then answer the questions below.</p>
+        </div>
+      </div>
+      <div class="card-grid cols-2" style="margin-bottom:1rem;">
+        <div class="card">
+          <div style="font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--purple);margin-bottom:.6rem;">Questions to think about</div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:.5rem;">
+            <li style="font-size:.88rem;color:var(--slate-mid);">📐 What will you <strong>measure</strong>? What are the column headings?</li>
+            <li style="font-size:.88rem;color:var(--slate-mid);">📏 What <strong>units</strong> do you need?</li>
+            <li style="font-size:.88rem;color:var(--slate-mid);">🔢 What <strong>range of angles</strong> will you use? How many readings?</li>
+            <li style="font-size:.88rem;color:var(--slate-mid);">🔁 Should you take <strong>repeat readings</strong>? Why?</li>
+          </ul>
+        </div>
+        <div class="card" style="background:var(--amber-light);border-color:#fde68a;">
+          <div style="font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:.6rem;">Sketch your table here</div>
+          <div style="background:#fff;border:1.5px dashed #fde68a;border-radius:.5rem;height:130px;display:flex;align-items:center;justify-content:center;">
+            <span style="color:#d4ae6b;font-size:.85rem;">Draw your table in your book / whiteboard</span>
+          </div>
+        </div>
+      </div>
+      <div class="think-box" style="background:var(--purple-light);border-color:#c4b5fd;">
+        <div class="think-icon">💬</div>
+        <div class="think-text">
+          <h3 style="color:var(--purple);">Be ready to share</h3>
+          <p>Your teacher will ask a few pairs to share their table design. What makes a good scientific table? Think about: headings, units, number of rows, repeated readings.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SLIDE 6: TABLE ACTIVITY — differentiated ══ -->
+  <div class="slide" id="s6">
+    <div class="slide-header">
+      <span class="slide-label lbl-table">Table activity</span>
+      <h1 class="slide-title">Build your results table</h1>
+    </div>
+    <div class="slide-body">
+      <div class="diff-tabs">
+        <button class="diff-tab active" onclick="switchTab('independent')">⭐ Independent — build from scratch</button>
+        <button class="diff-tab" onclick="switchTab('supported')">🤝 Supported — sort the columns</button>
+        <button class="diff-tab" onclick="switchTab('model')">📋 Model answer</button>
+      </div>
+
+      <!-- Independent -->
+      <div class="diff-panel active" id="panel-independent">
+        <div class="card" style="margin-bottom:.75rem;">
+          <p style="font-size:.9rem;color:var(--slate-mid);margin-bottom:1rem;">In your book, draw a results table for this investigation. It should include all the columns, correct headings with units, and rows for your planned angles. Come back here to check against the model answer when done.</p>
+          <div style="font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--slate-light);margin-bottom:.5rem;">Checklist — does your table have…</div>
+          <div id="checklist" style="display:flex;flex-direction:column;gap:.4rem;">
+          </div>
+        </div>
+      </div>
+
+      <!-- Supported drag-drop -->
+      <div class="diff-panel" id="panel-supported">
+        <div class="card" style="margin-bottom:.75rem;">
+          <p style="font-size:.88rem;color:var(--slate-mid);margin-bottom:1rem;">Drag each heading or unit into the correct column of the table.</p>
+          <div style="font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--slate-light);margin-bottom:.5rem;">Items to place</div>
+          <div class="drag-zone" id="chipPool"></div>
+          <div style="font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--slate-light);margin:.75rem 0 .5rem;">Your table columns</div>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap;" id="dropCols"></div>
+          <button class="check-btn" style="margin-top:.75rem;" onclick="checkDrag()">Check my table</button>
+          <div class="quiz-feedback" id="dragFeedback"></div>
+        </div>
+      </div>
+
+      <!-- Model answer -->
+      <div class="diff-panel" id="panel-model">
+        <div class="card" style="margin-bottom:.75rem;">
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.75rem;">
+            <span class="good-badge good-green">✓ Headings with units</span>
+            <span class="good-badge good-blue">✓ 9 systematic readings</span>
+            <span class="good-badge good-green">✓ Repeat readings</span>
+            <span class="good-badge good-blue">✓ Mean calculated</span>
+          </div>
+          <table class="model-table">
+            <thead>
+              <tr>
+                <th>Angle of incidence, i (°)</th>
+                <th>Angle of reflection, r — reading 1 (°)</th>
+                <th>Angle of reflection, r — reading 2 (°)</th>
+                <th>Mean angle of reflection (°)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>10</td><td class="data">…</td><td class="data">…</td><td class="data">…</td></tr>
+              <tr><td>20</td><td class="data">…</td><td class="data">…</td><td class="data">…</td></tr>
+              <tr><td>30</td><td class="data">…</td><td class="data">…</td><td class="data">…</td></tr>
+              <tr><td>40</td><td class="data">…</td><td class="data">…</td><td class="data">…</td></tr>
+              <tr><td>50</td><td class="data">…</td><td class="data">…</td><td class="data">…</td></tr>
+              <tr><td>60</td><td class="data">…</td><td class="data">…</td><td class="data">…</td></tr>
+              <tr><td>70</td><td class="data">…</td><td class="data">…</td><td class="data">…</td></tr>
+              <tr><td>80</td><td class="data">…</td><td class="data">…</td><td class="data">…</td></tr>
+            </tbody>
+          </table>
+          <div style="font-size:.8rem;color:var(--slate-light);margin-top:.6rem;">Using 10° intervals gives 8 systematic readings. Two readings allow you to spot and average out measurement error.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SLIDE 7: PRACTICAL ══ -->
+  <div class="slide" id="s7">
+    <div class="slide-header">
+      <span class="slide-label lbl-prac">Practical</span>
+      <h1 class="slide-title">Ray-box investigation</h1>
+    </div>
+    <div class="slide-body">
+      <div class="card-grid cols-2" style="margin-bottom:1rem;">
+        <div>
+          <div style="font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--slate-light);margin-bottom:.75rem;">Method</div>
+          <div class="step-list">
+            <div class="step"><div class="step-num">1</div><p>Place the <strong>plane mirror</strong> on the line marked on your paper. Draw the mirror line with a pencil.</p></div>
+            <div class="step"><div class="step-num">2</div><p>Draw the <strong>normal</strong> at 90° to the mirror at the centre using a set square.</p></div>
+            <div class="step"><div class="step-num">3</div><p>Set the ray box to your first angle of incidence (10°). Mark two dots on the <strong>incident ray</strong>.</p></div>
+            <div class="step"><div class="step-num">4</div><p>Mark two dots on the <strong>reflected ray</strong>. Remove the mirror and draw both rays with a ruler.</p></div>
+            <div class="step"><div class="step-num">5</div><p>Measure the <strong>angle of reflection</strong> from the normal using a protractor. Record in your table.</p></div>
+            <div class="step"><div class="step-num">6</div><p>Repeat for each angle in your table. Take a <strong>second reading</strong> for each angle.</p></div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--slate-light);margin-bottom:.75rem;">Equipment you need</div>
+          <div class="card" style="margin-bottom:.75rem;">
+            <ul style="list-style:none;display:flex;flex-direction:column;gap:.4rem;">
+              <li style="font-size:.88rem;color:var(--slate-mid);">💡 Ray box with single slit</li>
+              <li style="font-size:.88rem;color:var(--slate-mid);">🪞 Plane (flat) mirror</li>
+              <li style="font-size:.88rem;color:var(--slate-mid);">📐 Protractor</li>
+              <li style="font-size:.88rem;color:var(--slate-mid);">📏 30 cm ruler</li>
+              <li style="font-size:.88rem;color:var(--slate-mid);">✏️ Pencil and paper</li>
+            </ul>
+          </div>
+          <div class="think-box" style="background:var(--blue-light);border-color:#bfdbfe;">
+            <div class="think-icon">⚠️</div>
+            <div class="think-text">
+              <h3 style="color:var(--blue);">Key reminders</h3>
+              <p style="color:var(--slate-mid);">Always measure angles from the <strong>normal</strong>, never from the mirror. Mark two dots on each ray so you can draw them accurately after removing the mirror.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SLIDE 8: INTERACTIVE SIMULATION (own practice) ══ -->
+  <div class="slide" id="s8">
+    <div class="slide-header">
+      <span class="slide-label lbl-explore">Simulate</span>
+      <h1 class="slide-title">Try it yourself — interactive simulation</h1>
+    </div>
+    <div class="slide-body">
+      <p style="font-size:.9rem;color:var(--slate-mid);margin-bottom:.75rem;">Use the slider to change the angle of incidence. Record five pairs of readings in your results table.</p>
+      <div style="background:#fff;border:1px solid var(--border);border-radius:.75rem;overflow:hidden;">
+        <div style="padding:.6rem 1rem;background:#f8fafc;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+          <label style="font-size:.85rem;color:var(--slate-light);">Angle of incidence (°):</label>
+          <input type="range" id="embSlider" min="5" max="85" value="40" step="5" style="width:160px;">
+          <span style="font-size:1.1rem;font-weight:600;color:var(--slate);min-width:36px;" id="embVal">40°</span>
+          <span style="font-size:.85rem;color:var(--green);font-weight:500;margin-left:auto;">Angle of reflection = <span id="embRef">40°</span></span>
+        </div>
+        <canvas id="embCanvas" height="280" style="display:block;width:100%;"></canvas>
+      </div>
+      <div class="draw-legend" style="margin-top:.6rem;">
+        <div class="dleg"><div class="dleg-line" style="background:#378ADD;"></div>Incident ray</div>
+        <div class="dleg"><div class="dleg-line" style="background:#D85A30;"></div>Reflected ray</div>
+        <div class="dleg"><div class="dleg-line" style="height:0;border-top:2px dashed #888;width:28px;"></div>Normal</div>
+        <div class="dleg"><div class="dleg-line" style="background:#1D9E75;"></div>Mirror</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SLIDE 9: DRAW YOUR OWN DIAGRAM ══ -->
+  <div class="slide" id="s9">
+    <div class="slide-header">
+      <span class="slide-label lbl-draw">Draw it</span>
+      <h1 class="slide-title">Draw an accurate reflection diagram</h1>
+    </div>
+    <div class="slide-body">
+      <div class="card-grid cols-2" style="margin-bottom:.75rem;align-items:start;">
+        <div>
+          <div style="font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--slate-light);margin-bottom:.5rem;">Your task</div>
+          <div class="card" style="margin-bottom:.75rem;">
+            <p style="font-size:.88rem;color:var(--slate-mid);line-height:1.55;">Draw a <strong>complete reflection diagram</strong> for an angle of incidence of <strong>50°</strong>. Your diagram must show:</p>
+            <ul style="margin:.6rem 0 0 1rem;font-size:.85rem;color:var(--slate-mid);line-height:1.7;">
+              <li>Mirror surface (solid line)</li>
+              <li>Normal (dashed line, 90° to mirror)</li>
+              <li>Incident ray with arrow</li>
+              <li>Reflected ray with arrow</li>
+              <li>Angles i and r labelled correctly</li>
+            </ul>
+          </div>
+          <div class="draw-legend">
+            <div class="dleg"><div class="dleg-line" style="background:#378ADD;"></div><span style="font-size:.78rem;">Blue — incident ray</span></div>
+            <div class="dleg"><div class="dleg-line" style="background:#D85A30;"></div><span style="font-size:.78rem;">Orange — reflected ray</span></div>
+            <div class="dleg"><div class="dleg-line" style="background:#1D9E75;"></div><span style="font-size:.78rem;">Green — mirror</span></div>
+            <div class="dleg"><div class="dleg-line" style="background:#888;height:0;border-top:2px dashed #888;width:28px;"></div><span style="font-size:.78rem;">Grey dashed — normal</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="draw-canvas-wrap">
+            <div class="draw-tools">
+              <label>Colour:</label>
+              <div class="colour-btn selected" style="background:#378ADD;" data-color="#378ADD" onclick="setColor(this)"></div>
+              <div class="colour-btn" style="background:#D85A30;" data-color="#D85A30" onclick="setColor(this)"></div>
+              <div class="colour-btn" style="background:#1D9E75;" data-color="#1D9E75" onclick="setColor(this)"></div>
+              <div class="colour-btn" style="background:#888780;" data-color="#888780" onclick="setColor(this)"></div>
+              <div class="colour-btn" style="background:#1e293b;" data-color="#1e293b" onclick="setColor(this)"></div>
+              <div style="width:1px;height:22px;background:var(--border);margin:0 2px;"></div>
+              <label>Size:</label>
+              <button class="size-btn selected" data-size="2" onclick="setSize(this)">thin</button>
+              <button class="size-btn" data-size="4" onclick="setSize(this)">medium</button>
+              <button class="size-btn" data-size="7" onclick="setSize(this)">thick</button>
+              <button class="size-btn" style="margin-left:auto;" onclick="clearDraw()">clear</button>
+            </div>
+            <canvas id="drawCanvas" width="600" height="320" style="display:block;width:100%;"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SLIDE 10: QUIZ ══ -->
+  <div class="slide" id="s10">
+    <div class="slide-header">
+      <span class="slide-label lbl-quiz">Quiz</span>
+      <h1 class="slide-title">Check your understanding</h1>
+    </div>
+    <div class="slide-body">
+      <div class="quiz-progress" id="qProgress"></div>
+      <div id="quizContainer"></div>
+    </div>
+  </div>
+
+  <!-- ══ SLIDE 11: EXIT TICKET ══ -->
+  <div class="slide" id="s11">
+    <div class="slide-header">
+      <span class="slide-label lbl-exit">Exit ticket</span>
+      <h1 class="slide-title">What have you learned today?</h1>
+    </div>
+    <div class="slide-body">
+      <div class="card-grid cols-2" style="margin-bottom:1rem;align-items:start;">
+        <div>
+          <div style="font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--green);margin-bottom:.5rem;">In your own words</div>
+          <p style="font-size:.88rem;color:var(--slate-mid);margin-bottom:.6rem;">Write one sentence that explains the law of reflection. Use the correct scientific vocabulary.</p>
+          <textarea class="exit-textarea" placeholder="The law of reflection states that…"></textarea>
+          <div style="font-size:.78rem;color:var(--slate-light);margin-top:.3rem;">Try to use: angle of incidence, angle of reflection, normal</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:.75rem;">
+          <div class="card">
+            <div style="font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--slate-light);margin-bottom:.5rem;">How confident do you feel?</div>
+            <div class="star-row" id="stars">
+              <span class="star" onclick="rateStar(1)">☆</span>
+              <span class="star" onclick="rateStar(2)">☆</span>
+              <span class="star" onclick="rateStar(3)">☆</span>
+              <span class="star" onclick="rateStar(4)">☆</span>
+              <span class="star" onclick="rateStar(5)">☆</span>
+            </div>
+          </div>
+          <div class="card" style="background:var(--green-light);border-color:#86efac;">
+            <div style="font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--green);margin-bottom:.4rem;">Next lesson</div>
+            <p style="font-size:.88rem;color:var(--slate-mid);">We'll use the law of reflection to explain how <strong>periscopes</strong> and <strong>kaleidoscopes</strong> work — and investigate what happens when light passes into a different material.</p>
+          </div>
+          <div class="card">
+            <div style="font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--slate-light);margin-bottom:.4rem;">Homework suggestion</div>
+            <p style="font-size:.88rem;color:var(--slate-mid);">Research one real-world use of reflection (e.g. satellite dishes, cat's eyes, telescopes). Write 3–4 sentences explaining how reflection is involved.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /deck -->
+
+<!-- ── Navigation bar ── -->
+<div class="nav">
+  <button id="prevBtn" onclick="goSlide(-1)" disabled>← Prev</button>
+  <div class="counter" id="counter">1 / 11</div>
+  <button id="nextBtn" onclick="goSlide(1)">Next →</button>
+</div>
+
+<script>
+// ── Slide navigation ──
+let current = 0;
+const slides = document.querySelectorAll('.slide');
+const total = slides.length;
+
+function goSlide(dir) {
+  slides[current].classList.remove('active');
+  current = Math.max(0, Math.min(total - 1, current + dir));
+  slides[current].classList.add('active');
+  document.getElementById('prevBtn').disabled = current === 0;
+  document.getElementById('nextBtn').disabled = current === total - 1;
+  document.getElementById('counter').textContent = (current + 1) + ' / ' + total;
+  if (current === 7) initEmbCanvas();
+}
+
+// ── Diff tabs ──
+function switchTab(id) {
+  document.querySelectorAll('.diff-tab').forEach((t,i) => {
+    const ids = ['independent','supported','model'];
+    t.classList.toggle('active', ids[i] === id);
+  });
+  document.querySelectorAll('.diff-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  if (id === 'supported') initDrag();
+}
+
+// ── Checklist ──
+const checkItems = ['Column heading: Angle of incidence, i', 'Column heading: Angle of reflection, r', 'Units in degrees (°)', 'At least 6 different angles', 'Angles spread systematically (e.g. every 10°)', 'Repeat readings column', 'Mean / average column'];
+const cl = document.getElementById('checklist');
+if (cl) {
+  checkItems.forEach(item => {
+    const d = document.createElement('div');
+    d.style.cssText = 'display:flex;align-items:center;gap:.5rem;';
+    d.innerHTML = `<input type="checkbox" style="width:16px;height:16px;cursor:pointer;accent-color:#15803d;"><span style="font-size:.85rem;color:#334155;">${item}</span>`;
+    cl.appendChild(d);
+  });
+}
+
+// ── Drag and drop ──
+const dragData = {
+  headings: ['Angle of incidence, i (°)', 'Angle of reflection, r (°)', 'Mean angle of reflection (°)', 'Reading 1 (°)', 'Reading 2 (°)'],
+  columns: ['Column 1', 'Column 2', 'Column 3', 'Column 4']
+};
+let dragInitDone = false;
+
+function initDrag() {
+  if (dragInitDone) return;
+  dragInitDone = true;
+  const pool = document.getElementById('chipPool');
+  const cols = document.getElementById('dropCols');
+  if (!pool || !cols) return;
+
+  dragData.headings.forEach(h => {
+    const chip = document.createElement('div');
+    chip.className = 'drag-chip';
+    chip.draggable = true;
+    chip.textContent = h;
+    chip.dataset.label = h;
+    chip.addEventListener('dragstart', e => { e.dataTransfer.setData('text', h); chip.classList.add('placed'); });
+    pool.appendChild(chip);
+  });
+
+  dragData.columns.forEach((c, i) => {
+    const col = document.createElement('div');
+    col.className = 'drop-col';
+    col.dataset.col = i;
+    col.innerHTML = `<h4>${c}</h4>`;
+    col.addEventListener('dragover', e => { e.preventDefault(); col.classList.add('drag-over'); });
+    col.addEventListener('dragleave', () => col.classList.remove('drag-over'));
+    col.addEventListener('drop', e => {
+      e.preventDefault();
+      col.classList.remove('drag-over');
+      const label = e.dataTransfer.getData('text');
+      const chip = document.createElement('div');
+      chip.className = 'drag-chip';
+      chip.textContent = label;
+      chip.draggable = true;
+      chip.dataset.label = label;
+      chip.addEventListener('dragstart', ev => { ev.dataTransfer.setData('text', label); chip.remove(); });
+      col.appendChild(chip);
+      const poolChips = pool.querySelectorAll('.drag-chip');
+      poolChips.forEach(pc => { if (pc.dataset.label === label) pc.remove(); });
+    });
+    cols.appendChild(col);
+  });
+}
+
+function checkDrag() {
+  const fb = document.getElementById('dragFeedback');
+  const cols = document.querySelectorAll('.drop-col');
+  let placed = 0;
+  cols.forEach(col => { placed += col.querySelectorAll('.drag-chip').length; });
+  if (placed < 3) { fb.textContent = 'Place at least 3 headings into columns first!'; fb.style.color = '#dc2626'; return; }
+  fb.textContent = '✓ Looking good — compare against the model answer tab to check!';
+  fb.style.color = '#15803d';
+}
+
+// ── Embed simulation ──
+function initEmbCanvas() {
+  const canvas = document.getElementById('embCanvas');
+  if (!canvas || canvas._init) return;
+  canvas._init = true;
+  const ctx = canvas.getContext('2d');
+  const slider = document.getElementById('embSlider');
+  const valEl = document.getElementById('embVal');
+  const refEl = document.getElementById('embRef');
+
+  function draw() {
+    const W = canvas.width = canvas.offsetWidth * window.devicePixelRatio;
+    const H = canvas.height = 280 * window.devicePixelRatio;
+    ctx.scale(1,1);
+    const s = window.devicePixelRatio;
+    const w = W/s, h = H/s;
+    ctx.clearRect(0, 0, W, H);
+    ctx.save(); ctx.scale(s, s);
+
+    const mx = w/2, my = h - 50, ray = Math.min(w, h) * 0.5;
+    const deg = parseInt(slider.value), rad = deg * Math.PI / 180;
+
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h);
+
+    ctx.strokeStyle = '#1D9E75'; ctx.lineWidth = 3.5;
+    ctx.beginPath(); ctx.moveTo(30, my); ctx.lineTo(w - 30, my); ctx.stroke();
+
+    ctx.setLineDash([7,5]); ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(mx, my - ray * 0.85); ctx.lineTo(mx, my + 25); ctx.stroke();
+    ctx.setLineDash([]);
+
+    drawA(ctx, mx - Math.sin(rad)*ray, my - Math.cos(rad)*ray, mx, my, '#378ADD', 2.5);
+    drawA(ctx, mx, my, mx + Math.sin(rad)*ray, my - Math.cos(rad)*ray, '#D85A30', 2.5);
+
+    ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1;
+    const ar = 50;
+    ctx.beginPath(); ctx.arc(mx, my, ar, -Math.PI/2 - rad, -Math.PI/2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(mx, my, ar, -Math.PI/2, -Math.PI/2 + rad); ctx.stroke();
+
+    ctx.font = '500 13px DM Sans, sans-serif';
+    ctx.fillStyle = '#0C447C';
+    ctx.fillText('i = ' + deg + '°', mx - Math.sin(rad/2)*(ar+28) - 10, my - Math.cos(rad/2)*(ar+10));
+    ctx.fillStyle = '#993C1D';
+    ctx.fillText('r = ' + deg + '°', mx + Math.sin(rad/2)*(ar+28) - 10, my - Math.cos(rad/2)*(ar+10));
+    ctx.fillStyle = '#64748b'; ctx.font = '12px DM Sans, sans-serif';
+    ctx.fillText('normal', mx + 5, my - ray * 0.8);
+
+    ctx.restore();
+  }
+
+  function drawA(ctx, x1, y1, x2, y2, col, lw) {
+    const ang = Math.atan2(y2-y1, x2-x1), hl = 12;
+    ctx.strokeStyle = col; ctx.fillStyle = col; ctx.lineWidth = lw;
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x2, y2);
+    ctx.lineTo(x2 - hl*Math.cos(ang-.4), y2 - hl*Math.sin(ang-.4));
+    ctx.lineTo(x2 - hl*Math.cos(ang+.4), y2 - hl*Math.sin(ang+.4));
+    ctx.closePath(); ctx.fill();
+  }
+
+  slider.addEventListener('input', () => {
+    valEl.textContent = slider.value + '°';
+    refEl.textContent = slider.value + '°';
+    draw();
+  });
+  draw();
+  window.addEventListener('resize', draw);
+}
+
+// ── Drawing canvas ──
+let drawColor = '#378ADD', drawSize = 2, drawing = false, lastX = 0, lastY = 0;
+
+function setColor(el) {
+  document.querySelectorAll('.colour-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected'); drawColor = el.dataset.color;
+}
+function setSize(el) {
+  document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected'); drawSize = parseInt(el.dataset.size);
+}
+function clearDraw() {
+  const c = document.getElementById('drawCanvas');
+  if (!c) return;
+  const ctx = c.getContext('2d');
+  ctx.clearRect(0, 0, c.width, c.height);
+  drawBackground();
+}
+
+function drawBackground() {
+  const c = document.getElementById('drawCanvas');
+  if (!c) return;
+  const ctx = c.getContext('2d'), W = c.width, H = c.height;
+  ctx.clearRect(0,0,W,H);
+  const my = H - 60;
+  ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1;
+  for (let x = 0; x < W; x += 30) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+  for (let y = 0; y < H; y += 30) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+  ctx.strokeStyle = '#64748b'; ctx.setLineDash([6,4]); ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(W/2, 20); ctx.lineTo(W/2, my + 20); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(20, my); ctx.lineTo(W-20, my); ctx.stroke();
+  ctx.fillStyle = '#94a3b8'; ctx.font = '11px DM Sans, sans-serif';
+  ctx.fillText('mirror line', 25, my - 5);
+  ctx.fillText('normal (dashed)', W/2 + 5, 32);
+}
+
+setTimeout(() => {
+  const c = document.getElementById('drawCanvas');
+  if (!c) return;
+  c.width = c.offsetWidth || 600;
+  drawBackground();
+  const ctx = c.getContext('2d');
+  const getPos = (e, el) => {
+    const r = el.getBoundingClientRect();
+    const src = e.touches ? e.touches[0] : e;
+    return [(src.clientX - r.left) * (el.width / r.width), (src.clientY - r.top) * (el.height / r.height)];
+  };
+  c.addEventListener('mousedown', e => { drawing = true; [lastX, lastY] = getPos(e, c); });
+  c.addEventListener('mousemove', e => {
+    if (!drawing) return;
+    const [x, y] = getPos(e, c);
+    ctx.strokeStyle = drawColor; ctx.lineWidth = drawSize;
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(x, y); ctx.stroke();
+    [lastX, lastY] = [x, y];
+  });
+  c.addEventListener('mouseup', () => drawing = false);
+  c.addEventListener('mouseleave', () => drawing = false);
+  c.addEventListener('touchstart', e => { e.preventDefault(); drawing = true; [lastX, lastY] = getPos(e, c); });
+  c.addEventListener('touchmove', e => {
+    e.preventDefault(); if (!drawing) return;
+    const [x, y] = getPos(e, c);
+    ctx.strokeStyle = drawColor; ctx.lineWidth = drawSize;
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(x, y); ctx.stroke();
+    [lastX, lastY] = [x, y];
+  });
+  c.addEventListener('touchend', () => drawing = false);
+}, 200);
+
+// ── Quiz ──
+const quizData = [
+  {
+    type: 'mc',
+    q: 'A light ray hits a mirror with an angle of incidence of 42°. What is the angle of reflection?',
+    opts: ['42°', '48°', '84°', '90°'],
+    ans: 0
+  },
+  {
+    type: 'tf',
+    q: 'True or False: The angle of incidence is measured between the incident ray and the mirror surface.',
+    ans: false
+  },
+  {
+    type: 'mc',
+    q: 'A reflected ray makes an angle of 65° with the mirror surface. What is the angle of reflection (from the normal)?',
+    opts: ['65°', '25°', '130°', '90°'],
+    ans: 1
+  },
+  {
+    type: 'fill',
+    q: 'Complete the sentence: The normal is always drawn at ___ ° to the mirror surface.',
+    ans: '90'
+  },
+  {
+    type: 'mc',
+    q: 'Which of the following correctly describes the normal?',
+    opts: [
+      'A real ray of light travelling through the mirror',
+      'An imaginary dashed line at 90° to the mirror at the point of incidence',
+      'The angle between the incident and reflected rays',
+      'The surface of the mirror itself'
+    ],
+    ans: 1
+  },
+  {
+    type: 'mc',
+    q: 'In a reflection experiment, a student measures i = 30° and r = 28°. Which is most likely?',
+    opts: [
+      'The law of reflection has been disproved',
+      'The student measured from the mirror surface, not the normal',
+      'There was a small measurement error',
+      'The mirror is curved'
+    ],
+    ans: 2
+  }
+];
+
+let qIndex = 0, score = 0, answered = [];
+const qContainer = document.getElementById('quizContainer');
+
+function renderQuiz() {
+  const prog = document.getElementById('qProgress');
+  if (prog) {
+    prog.innerHTML = quizData.map((_, i) => {
+      let cls = 'qpip';
+      if (i < qIndex) cls += answered[i] ? ' done-correct' : ' done-wrong';
+      else if (i === qIndex) cls += ' current';
+      return `<div class="${cls}"></div>`;
+    }).join('');
+  }
+
+  if (qIndex >= quizData.length) {
+    qContainer.innerHTML = `
+      <div class="quiz-score">
+        <div style="font-size:3rem;">${score >= 5 ? '🎉' : score >= 3 ? '😊' : '💪'}</div>
+        <div style="margin:.5rem 0;">${score} / ${quizData.length} correct</div>
+        <div style="font-size:1rem;color:var(--slate-light);font-family:var(--sans);">${score === quizData.length ? 'Perfect score! Excellent work.' : score >= 4 ? 'Great understanding — review any you missed.' : 'Good effort — check the key terms slide and try again.'}</div>
+        <button class="check-btn" style="margin-top:1rem;" onclick="resetQuiz()">Try again</button>
+      </div>`;
+    return;
+  }
+
+  const q = quizData[qIndex];
+  let html = `<div class="quiz-q-box"><p class="quiz-q">Question ${qIndex+1} of ${quizData.length}: ${q.q}</p>`;
+
+  if (q.type === 'mc') {
+    html += `<div class="quiz-options">` + q.opts.map((o, i) =>
+      `<button class="quiz-opt" onclick="answerMC(${i})">${o}</button>`).join('') + `</div>`;
+  } else if (q.type === 'tf') {
+    html += `<div class="tf-opts">
+      <button class="tf-opt" onclick="answerTF(true)">True</button>
+      <button class="tf-opt" onclick="answerTF(false)">False</button>
+    </div>`;
+  } else if (q.type === 'fill') {
+    html += `<input type="text" class="fill-input" id="fillInp" placeholder="Type your answer…">
+      <button class="check-btn" onclick="answerFill()">Check</button>`;
+  }
+  html += `<div class="quiz-feedback" id="qFeedback"></div></div>`;
+  qContainer.innerHTML = html;
+}
+
+function answerMC(i) {
+  const q = quizData[qIndex];
+  const opts = qContainer.querySelectorAll('.quiz-opt');
+  opts.forEach(o => o.onclick = null);
+  const correct = i === q.ans;
+  opts[i].classList.add(correct ? 'correct' : 'wrong');
+  if (!correct) opts[q.ans].classList.add('reveal');
+  setFeedback(correct);
+  answered.push(correct); if (correct) score++;
+  setTimeout(() => { qIndex++; renderQuiz(); }, 1600);
+}
+
+function answerTF(val) {
+  const q = quizData[qIndex];
+  const btns = qContainer.querySelectorAll('.tf-opt');
+  btns.forEach(b => b.onclick = null);
+  const correct = val === q.ans;
+  btns[val ? 0 : 1].classList.add(correct ? 'correct' : 'wrong');
+  if (!correct) btns[q.ans ? 0 : 1].classList.add('reveal');
+  setFeedback(correct);
+  answered.push(correct); if (correct) score++;
+  setTimeout(() => { qIndex++; renderQuiz(); }, 1600);
+}
+
+function answerFill() {
+  const inp = document.getElementById('fillInp');
+  if (!inp) return;
+  const q = quizData[qIndex];
+  const val = inp.value.trim().replace('°','');
+  const correct = val === q.ans;
+  inp.style.borderColor = correct ? 'var(--green)' : '#dc2626';
+  setFeedback(correct, correct ? null : 'The answer is ' + q.ans + '°');
+  answered.push(correct); if (correct) score++;
+  setTimeout(() => { qIndex++; renderQuiz(); }, 1800);
+}
+
+function setFeedback(correct, msg) {
+  const fb = document.getElementById('qFeedback');
+  if (!fb) return;
+  fb.textContent = msg || (correct ? '✓ Correct!' : '✗ Not quite — see the highlighted answer');
+  fb.style.color = correct ? 'var(--green)' : '#dc2626';
+}
+
+function resetQuiz() {
+  qIndex = 0; score = 0; answered = [];
+  renderQuiz();
+}
+
+renderQuiz();
+
+// ── Stars ──
+function rateStar(n) {
+  const stars = document.querySelectorAll('#stars .star');
+  stars.forEach((s, i) => { s.textContent = i < n ? '★' : '☆'; s.style.color = i < n ? '#f59e0b' : ''; });
+}
+window.rateStar = rateStar;
+window.checkDrag = checkDrag;
+window.switchTab = switchTab;
+window.setColor = setColor;
+window.setSize = setSize;
+window.clearDraw = clearDraw;
+window.answerMC = answerMC;
+window.answerTF = answerTF;
+window.answerFill = answerFill;
+window.resetQuiz = resetQuiz;
+</script>
+</body>
+</html>
